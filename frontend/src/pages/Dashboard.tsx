@@ -419,6 +419,53 @@ const Dashboard = () => {
                       onChange={(e) => setNewAppointment({ ...newAppointment, time: e.target.value })}
                     />
                   </div>
+                  <div>
+                    <Label htmlFor="duration">Duration (minutes)</Label>
+                    <Input
+                      id="duration"
+                      type="number"
+                      value={newAppointment.duration}
+                      onChange={(e) => setNewAppointment({ ...newAppointment, duration: parseInt(e.target.value) || 30 })}
+                      min="15"
+                      max="180"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="visitType">Visit Type</Label>
+                    <Select value={newAppointment.visitType} onValueChange={(value) => setNewAppointment({ ...newAppointment, visitType: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select visit type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Check-up">Check-up</SelectItem>
+                        <SelectItem value="Procedure">Procedure</SelectItem>
+                        <SelectItem value="Emergency">Emergency</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="status">Status</Label>
+                    <Select value={newAppointment.status} onValueChange={(value) => setNewAppointment({ ...newAppointment, status: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Not Done">Not Done</SelectItem>
+                        <SelectItem value="Done">Done</SelectItem>
+                        <SelectItem value="Canceled">Canceled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="notes">Notes</Label>
+                    <Textarea
+                      id="notes"
+                      value={newAppointment.notes}
+                      onChange={(e) => setNewAppointment({ ...newAppointment, notes: e.target.value })}
+                      placeholder="Enter appointment notes"
+                      rows={3}
+                    />
+                  </div>
                   <Button onClick={handleScheduleAppointment} className="w-full">
                     <Calendar className="h-4 w-4 mr-2" />
                     Schedule Appointment

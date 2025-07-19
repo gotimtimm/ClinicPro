@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clinicnexus.dto.CreateAppointmentDTO;
 import com.clinicnexus.model.Appointment;
 import com.clinicnexus.service.AppointmentService;
-import com.clinicnexus.dto.CreateAppointmentDTO;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -80,22 +80,33 @@ public class AppointmentController {
     
     @PostMapping("/with-names")
     public ResponseEntity<Map<String, Object>> createAppointmentWithNames(@RequestBody CreateAppointmentDTO appointmentDTO) {
-        int id = appointmentService.createAppointmentWithNames(
-            appointmentDTO.getPatientName(),
-            appointmentDTO.getDoctorName(),
-            appointmentDTO.getDate(),
-            appointmentDTO.getTime(),
-            appointmentDTO.getDuration(),
-            appointmentDTO.getVisitType(),
-            appointmentDTO.getStatus(),
-            appointmentDTO.getNotes()
-        );
-        
-        if (id > 0) {
-            Map<String, Object> created = appointmentService.getAppointmentWithRelatedRecords(id);
-            return ResponseEntity.ok(created);
-        } else {
-            return ResponseEntity.badRequest().build();
+        try {
+            // Validate DTO
+            if (appointmentDTO == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            int id = appointmentService.createAppointmentWithNames(
+                appointmentDTO.getPatientName(),
+                appointmentDTO.getDoctorName(),
+                appointmentDTO.getDate(),
+                appointmentDTO.getTime(),
+                appointmentDTO.getDuration(),
+                appointmentDTO.getVisitType(),
+                appointmentDTO.getStatus(),
+                appointmentDTO.getNotes()
+            );
+            
+            if (id > 0) {
+                Map<String, Object> created = appointmentService.getAppointmentWithRelatedRecords(id);
+                return ResponseEntity.ok(created);
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+        } catch (Exception e) {
+            System.err.println("Error in createAppointmentWithNames controller: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

@@ -48,16 +48,55 @@ public class AppointmentService {
     public int createAppointmentWithNames(String patientName, String doctorName, String date, 
                                          String time, Integer duration, String visitType, 
                                          String status, String notes) {
-        // Convert string date and time to Date and Time objects
-        java.sql.Date sqlDate = java.sql.Date.valueOf(date);
-        
-        // Handle time format - add seconds if not present
-        String timeWithSeconds = time;
-        if (time.split(":").length == 2) {
-            timeWithSeconds = time + ":00";
+        try {
+            // Validate required fields
+            if (patientName == null || patientName.trim().isEmpty()) {
+                System.err.println("Patient name is required");
+                return -1;
+            }
+            if (doctorName == null || doctorName.trim().isEmpty()) {
+                System.err.println("Doctor name is required");
+                return -1;
+            }
+            if (date == null || date.trim().isEmpty()) {
+                System.err.println("Date is required");
+                return -1;
+            }
+            if (time == null || time.trim().isEmpty()) {
+                System.err.println("Time is required");
+                return -1;
+            }
+            if (duration == null || duration <= 0) {
+                System.err.println("Duration must be greater than 0");
+                return -1;
+            }
+            if (visitType == null || visitType.trim().isEmpty()) {
+                System.err.println("Visit type is required");
+                return -1;
+            }
+            if (status == null || status.trim().isEmpty()) {
+                System.err.println("Status is required");
+                return -1;
+            }
+            
+            // Convert string date and time to Date and Time objects
+            java.sql.Date sqlDate = java.sql.Date.valueOf(date);
+            
+            // Handle time format - add seconds if not present
+            String timeWithSeconds = time;
+            if (time.split(":").length == 2) {
+                timeWithSeconds = time + ":00";
+            }
+            java.sql.Time sqlTime = java.sql.Time.valueOf(timeWithSeconds);
+            
+            return appointmentDAO.addAppointmentWithNames(patientName, doctorName, sqlDate, sqlTime, duration, visitType, status, notes);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid date or time format: " + e.getMessage());
+            return -1;
+        } catch (Exception e) {
+            System.err.println("Error creating appointment with names: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
         }
-        java.sql.Time sqlTime = java.sql.Time.valueOf(timeWithSeconds);
-        
-        return appointmentDAO.addAppointmentWithNames(patientName, doctorName, sqlDate, sqlTime, duration, visitType, status, notes);
     }
 } 

@@ -453,15 +453,12 @@ public class AppointmentDAO {
     public int addAppointmentWithNames(String patientName, String doctorName, Date date, 
                                       Time time, Integer duration, String visitType, 
                                       String status, String notes) {
-        // First get patient and doctor IDs
-        PatientDAO patientDAO = new PatientDAO();
-        StaffDAO staffDAO = new StaffDAO();
-        
-        int patientID = patientDAO.getPatientIdByName(patientName);
-        int doctorID = staffDAO.getStaffIdByName(doctorName);
+        // First get patient and doctor IDs directly using SQL queries
+        int patientID = getPatientIdByName(patientName);
+        int doctorID = getStaffIdByName(doctorName);
         
         if (patientID == -1 || doctorID == -1) {
-            System.err.println("Patient or doctor not found");
+            System.err.println("Patient or doctor not found. Patient: " + patientName + ", Doctor: " + doctorName);
             return -1;
         }
         
@@ -477,5 +474,51 @@ public class AppointmentDAO {
         appointment.setNotes(notes);
         
         return addAppointment(appointment);
+    }
+    
+    /**
+     * Get patient ID by name
+     * @param name Name of patient
+     * @return Patient ID or -1 if not found
+     */
+    private int getPatientIdByName(String name) {
+        String sql = "SELECT PatientID FROM Patient WHERE Name = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("PatientID");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting patient ID by name: " + e.getMessage());
+        }
+        return -1;
+    }
+    
+    /**
+     * Get staff ID by name
+     * @param name Name of staff member
+     * @return Staff ID or -1 if not found
+     */
+    private int getStaffIdByName(String name) {
+        String sql = "SELECT StaffID FROM Staff WHERE Name = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("StaffID");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting staff ID by name: " + e.getMessage());
+        }
+        return -1;
     }
 }
